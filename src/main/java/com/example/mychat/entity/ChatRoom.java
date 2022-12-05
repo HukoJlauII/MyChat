@@ -7,8 +7,6 @@ import lombok.Setter;
 import org.springframework.data.rest.core.annotation.RestResource;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -25,9 +23,9 @@ public class ChatRoom {
     @Column(unique = true)
     private String roomName;
 
-    @RestResource(exported=false)
-    @OneToOne(targetEntity = User.class,fetch = FetchType.EAGER)
-    @JoinColumn(name="owner_id")
+    @RestResource(exported = false)
+    @OneToOne(targetEntity = User.class, fetch = FetchType.EAGER)
+    @JoinColumn(name = "owner_id")
     private User owner;
 
 

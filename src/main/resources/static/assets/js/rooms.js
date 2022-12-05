@@ -4,9 +4,12 @@ let createButton = modal.querySelector('.btn-primary')
 let cancelButton = modal.querySelector('.btn-secondary')
 let chatArea = document.querySelector('#chatRoom')
 let chatInputArea = document.querySelector('#chatInputArea')
+let editInputArea = document.querySelector('#editInputArea')
 let noChatArea = document.querySelector('#noChat')
 let topChatArea = document.querySelector('#topChat')
+let editChatArea = document.querySelector('#editChat')
 const sendButton = document.querySelector('#sendButton')
+const editSendButton = document.querySelector('#sendEditButton')
 let searchBar = document.querySelector('#searchBar')
 let searchButton = searchBar.querySelector('.fa-search')
 let lastResponse
@@ -150,6 +153,7 @@ function showChat(response) {
     currentRoom = response
 
     $.ajax(settings_2).done(function (response) {
+
         connect()
         topChatArea.style.display = 'block'
         chatArea.style.display = 'block'
@@ -162,8 +166,7 @@ function showChat(response) {
         customizeChatArea()
         showAllMessages(response._embedded.messages)
         chatArea.scrollTop = chatArea.scrollHeight
-        // console.log(response);
-        // createAllRooms(response)
+
     });
 }
 
@@ -181,35 +184,91 @@ function createMessage(response) {
     response.sender.avatar === null ? src = 'https://bootdey.com/img/Content/avatar/avatar6.png' : src = '\\image\\' + response.sender.avatar.id
     const message = document.createElement('div')
     message.id = "message-" + response.id
-    const date = new Date(response.sendTime);
-    // const year = date.getFullYear();
-    // const month = date.getMonth();
-    // const day = date.getDay();
+    const date = new Date(response.sendTime).toLocaleTimeString([],{timeStyle:'short'});
+    console.log(date)
 
-    const hour = date.getHours();
-    const minutes = date.getMinutes();
-
-    const dateString = `${hour}:${minutes}`;
+    // const hour = date.getHours();
+    // const minutes = date.getMinutes();
+    //
+    // const dateString = `${hour}:${minutes}`;
     if (response.sender.username !== user.username) {
-        message.classList.add("d-flex", "flex-row", "justify-content-start","rounded-3","mt-3","mb-3")
+        message.classList.add("d-flex", "flex-row", "justify-content-start", "rounded-3", "mt-3", "mb-3")
         message.innerHTML = "    <img class=\"rounded-circle\" src=\"" + src + "\"\n" +
-            "         alt=\"avatar 1\" style=\"width: 45px; height: 45px;\"  data-bs-toggle=\"tooltip\" data-bs-placement=\"bottom\" title=\""+response.sender.name+" " +response.sender.surname+"\">\n" +
+            "         alt=\"avatar 1\" style=\"width: 45px; height: 45px;\"  data-bs-toggle=\"tooltip\" data-bs-placement=\"bottom\" title=\"" + response.sender.name + " " + response.sender.surname + "\">\n" +
             "        <div>\n" +
             "            <p class=\"small p-2 ms-3 mb-1 rounded-3\" style=\"background-color: #f5f6f7;\">" + response.content + " </p>\n" +
-            "            <p class=\"small ms-3 mb-3 rounded-3 text-muted float-start\">" + dateString + "</p>\n" +
+            "            <p class=\"small ms-3 mb-3 rounded-3 text-muted float-start\">" + date + "</p>\n" +
             "        </div>"
     } else {
 
-        message.classList.add("d-flex", "flex-row", "justify-content-end","rounded-3","mt-3","mb-3")
+        message.classList.add("d-flex", "flex-row", "justify-content-end", "rounded-3", "mt-3", "mb-3")
         message.innerHTML = "<div>\n" +
             "        <p class=\"small p-2 me-3 mb-1 text-white rounded-3 bg-primary\">" + response.content + "</p>\n" +
-            "        <span class=\"small me-3  rounded-3 text-muted float-end\">" + dateString + "</span>\n" +
+            "        <span class=\"small me-3  rounded-3 text-muted float-end\">" + date + "</span>\n" +
             "    </div>\n" +
             "    <img class=\"rounded-circle\" src=\"" + src + "\"\n" +
             "         alt=\"avatar 1\" style=\"width: 45px; height: 45px;\">"
-        message.addEventListener('click',function ()
-        {
+        message.addEventListener('click', function () {
             message.classList.toggle('active-message')
+            if (topChatArea.style.display === 'block' || activeMessagesCount() > 0) {
+                topChatArea.style.display = 'none'
+                editChatArea.style.display = 'block'
+
+            } else {
+                topChatArea.style.display = 'block'
+                editChatArea.style.display = 'none'
+            }
+            if (activeMessagesCount() > 1) {
+                editChatArea.querySelector('.btn').style.display = 'none'
+            } else {
+                editChatArea.querySelector('.btn').style.display = 'block'
+            }
+            let editBtn = editChatArea.querySelector('.bi-pencil')
+            editBtn.addEventListener('click', function () {
+                message.classList.toggle('active-message')
+                editInputArea.classList.add('d-flex')
+                chatInputArea.classList.remove('d-flex')
+                chatInputArea.style.display = 'none'
+                editInputArea.querySelector('input').value = response.content
+                editInputArea.querySelector('.bi-x-lg').addEventListener('click',function ()
+                {
+                    backFromEdit()
+                })
+                editSendButton.addEventListener('click', function (){
+                        editMessage(response)
+                    }
+                )
+                document.querySelector('#exampleFormControlInput').addEventListener("keydown", function (event) {
+                    if (event.key === 'Enter') {
+                        event.preventDefault();
+                        editMessage(response)
+                    }
+                });
+            })
+            let deleteBtn = editChatArea.querySelector('.bi-trash')
+            deleteBtn.addEventListener('click', function () {
+                let selectedMessages = document.querySelectorAll('.active-message')
+                for (let i = 0; i < selectedMessages.length; i++) {
+                    let id = selectedMessages[i].id.split('-')[1]
+                    var settings = {
+                        "url": "http://localhost:8080/messages/" + id,
+                        "method": "DELETE",
+                        "timeout": 0,
+                        "headers": {
+                            "Content-Type": "application/json"
+                        },
+                    };
+
+                    $.ajax(settings).done(function (response) {
+
+                    });
+                    selectedMessages[i].parentNode.removeChild(selectedMessages[i])
+                }
+                topChatArea.style.display = 'block'
+                editChatArea.style.display = 'none'
+            })
+            editChatArea.querySelector('h5').innerHTML = activeMessagesCount() + " сообщение(-ий)"
+
         })
     }
 
@@ -275,15 +334,52 @@ document.querySelector('#exampleFormControlInput2').addEventListener("keydown", 
     }
 });
 
+function backFromEdit()
+{
+    chatInputArea.classList.add('d-flex')
+    editInputArea.classList.remove('d-flex')
+    editInputArea.style.display = 'none'
+    chatInputArea.style.display='block'
+    topChatArea.style.display = 'block'
+    editChatArea.style.display = 'none'
+}
+
+function editMessage(response){
+    editedData=document.querySelector('#exampleFormControlInput').value.trim()
+    if (editedData==='')
+    {
+        backFromEdit()
+        return
+    }
+    response.content=editedData
+    var settings = {
+        "url": "http://localhost:8080/messages/" + response.id,
+        "method": "PATCH",
+        "timeout": 0,
+        "headers": {
+            "Content-Type": "application/json"
+        },
+        "data":JSON.stringify(response)
+    };
+
+    $.ajax(settings).done(function (response) {
+        let message=document.querySelector('#message-'+response.id)
+        message.querySelector('p').innerHTML=response.content
+        backFromEdit()
+    });
+}
+
+
 function customizeChatArea() {
-    let roomName = document.querySelector('.card-title')
-    let cancelButton = document.querySelector('.btn-secondary')
+    console.log(currentRoom.roomName)
+
+    let roomName = topChatArea.querySelector('.card-title')
+    let cancelButton = topChatArea.querySelector('.btn-secondary')
     cancelButton.addEventListener('click', backToMenu)
+    console.log(roomName)
     let infoButton = document.querySelector('.btn-white')
     roomName.addEventListener('click', showInfoAboutRoom)
     roomName.innerHTML = currentRoom.roomName
-
-
 
 
 }
@@ -298,7 +394,7 @@ function showInfoAboutRoom() {
         },
     };
     $.ajax(settings).done(function (response) {
-        usersInRoom.innerHTML=''
+        usersInRoom.innerHTML = ''
         let allUsers = response._embedded.users
         for (let i = 0; i < allUsers.length; i++) {
             createUser(allUsers[i])
@@ -338,29 +434,12 @@ function createUser(response) {
     usersInRoom.appendChild(user)
 }
 
-// <li className="p-2 border-bottom"><a href="#!" className="d-flex justify-content-between">
-//     <div className="d-flex flex-row">
-//         <div>
-//             <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava1-bg.webp" alt="avatar"
-//                  className="d-flex align-self-center me-3" width="60">
-//                 <span className="badge bg-success badge-dot"></span>
-//         </div>
-//         <div className="pt-1">
-//             <p className="fw-bold mb-0">Комната для гениев</p>
-//             <p className="small text-muted">Move to this chat</p>
-//         </div>
-//     </div>
-//     <div className="pt-1">
-//         <p className="small text-muted mb-1">Just now</p>
-//     </div>
-// </a></li>
+
 
 $(chatArea).scroll(function () {
-
-    if (chatArea.getBoundingClientRect().y - chatArea.firstChild.getBoundingClientRect().y === -16 && lastResponse._links.self.href !== lastResponse._links.last.href) {
+    // console.log(   chatArea.getBoundingClientRect().y - chatArea.firstChild.getBoundingClientRect().y)
+    if (chatArea.getBoundingClientRect().y - chatArea.firstChild.getBoundingClientRect().y === -32 && lastResponse._links.self.href !== lastResponse._links.last.href) {
         let lastScrollHeight = chatArea.scrollHeight
-
-
         var settings = {
             "url": lastResponse._links.next.href,
             "method": "GET",
@@ -378,4 +457,8 @@ $(chatArea).scroll(function () {
         });
     }
 })
+
+function activeMessagesCount() {
+    return document.querySelectorAll('.active-message').length
+}
 

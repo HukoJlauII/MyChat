@@ -36,8 +36,8 @@ public class ImageController {
     }
 
     @PostMapping("/image/upload")
-    private String uploadPhoto(@AuthenticationPrincipal User user, @RequestParam ("Image")MultipartFile file) throws IOException {
-        if (file!=null) {
+    private String uploadPhoto(@AuthenticationPrincipal User user, @RequestParam("Image") MultipartFile file) throws IOException {
+        if (file != null) {
             Media media = new Media(file.getOriginalFilename(), file.getSize(), file.getContentType(), file.getBytes());
             user.setAvatar(media);
             userService.save(user);

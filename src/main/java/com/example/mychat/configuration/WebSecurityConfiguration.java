@@ -25,7 +25,7 @@ public class WebSecurityConfiguration {
                 .csrf(AbstractHttpConfigurer::disable);
         http
                 .authorizeRequests()
-                .antMatchers("/login*", "/register","/users**","/rooms*","chat/**")
+                .antMatchers("/login*", "/register", "/users**", "/rooms*", "chat/**")
                 .permitAll()
                 .anyRequest()
                 .authenticated();
@@ -56,7 +56,7 @@ public class WebSecurityConfiguration {
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
-        return (web) -> web.ignoring().antMatchers("/**/**/**/**.css", "/**/**/**/**.js","/**/**/**.png","/**/assets/**");
+        return (web) -> web.ignoring().antMatchers("/**/**/**/**.css", "/**/**/**/**.js", "/**/**/**.png", "/**/assets/**");
     }
 
 }

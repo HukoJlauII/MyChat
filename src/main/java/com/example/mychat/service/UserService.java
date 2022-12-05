@@ -8,7 +8,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
@@ -56,7 +55,7 @@ public class UserService implements UserDetailsService {
     }
 
     public User getUserAuth() {
-        User userAuth=(User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User userAuth = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return userRepository.findUserById(userAuth.getId());
     }
 
@@ -83,16 +82,15 @@ public class UserService implements UserDetailsService {
             return "/pages-register";
         }
     }
-    public String editProfile(RedirectAttributes redirectAttributes,
-                              User user,BindingResult bindingResult) {
-        User oldUser=getUserAuth();
 
-        if (findUserByEmail(user.getEmail())!=null && !oldUser.getEmail().equals(user.getEmail()))
-        {
+    public String editProfile(RedirectAttributes redirectAttributes,
+                              User user, BindingResult bindingResult) {
+        User oldUser = getUserAuth();
+
+        if (findUserByEmail(user.getEmail()) != null && !oldUser.getEmail().equals(user.getEmail())) {
             bindingResult.addError(new FieldError("user", "email", "Пользователь с такой почтой уже существует"));
         }
-        if (findUserByEmail(user.getUsername())!=null && !oldUser.getUsername().equals(user.getUsername()))
-        {
+        if (findUserByEmail(user.getUsername()) != null && !oldUser.getUsername().equals(user.getUsername())) {
             bindingResult.addError(new FieldError("user", "username", "Пользователь с таким никнеймом уже существует"));
         }
         if (bindingResult.hasErrors()) {

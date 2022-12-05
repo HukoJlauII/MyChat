@@ -349,15 +349,14 @@
                                                 </div>
 
                                                 <div class="col-md-6 col-lg-7 col-xl-8">
-                                                    <div id="topChat" class="col-xxl-0 col-xl-12"
+                                                    <div id="editChat" class="col-xxl-0 col-xl-12"
                                                          style="display: none;">
 
                                                         <div class="border-bottom">
 
                                                             <div class="card-header d-flex align-items-center justify-content-between">
-                                                                <div class="row"><h5 class="card-title text-center"
-                                                                                     data-bs-target="#largeModal"
-                                                                                     data-bs-toggle="modal">Комната для
+                                                                <div class="row flex-fill"><h5 class="card-title"
+                                                                                     >Комната для
                                                                     гениев</h5>
                                                                     <!--                                                                    <h7 id="roomSize" class="text-center">-->
                                                                     <!--                                                                        Комната для гениев-->
@@ -365,18 +364,18 @@
                                                                 </div>
 
                                                                 <button
-                                                                        class="btn btn-outline-secondary rounded-pill"><i
-                                                                        class="bi bi-three-dots"></i></button>
+                                                                        class="btn btn-outline-secondary rounded-pill m-2"><i
+                                                                        class="bi bi-pencil"></i></button>
                                                                 <button
-                                                                        class="btn btn-outline-secondary rounded-pill"><i
-                                                                        class="bi bi-three-dots"></i></button>
+                                                                        class="btn btn-outline-danger rounded-pill m-2"><i
+                                                                        class="bi bi-trash"></i></button>
                                                             </div>
 
 
                                                         </div>
 
                                                     </div>
-                                                    <div id="editChat" class="col-xxl-0 col-xl-12"
+                                                    <div id="topChat" class="col-xxl-0 col-xl-12"
                                                          style="display: none;">
 
                                                         <div class="border-bottom">
@@ -421,6 +420,20 @@
                                                         <a class="ms-3 text-muted" href="#!"><i
                                                                 class="fas fa-smile"></i></a>
                                                         <a id="sendButton" class="ms-3" href="#!"><i
+                                                                class="fas fa-paper-plane"></i></a>
+                                                    </div>
+                                                    <div id="editInputArea"
+                                                         class="text-muted justify-content-start align-items-center pe-3 pt-3 mt-2"
+                                                         style="display: none">
+                                                        <img th:src="${user.avatar!=null ? '/image/' +  user.avatar.getId():
+                                'https://bootdey.com/img/Content/avatar/avatar6.png'}"
+                                                             alt="avatar 3" style=" width: 40px; height: 100%;">
+                                                        <input type="text" class="form-control form-control-lg"
+                                                               id="exampleFormControlInput"
+                                                               placeholder="Type message">
+                                                        <a class="ms-1 text-muted" href="#!"><i
+                                                                class="bi bi-x-lg"></i></a>
+                                                        <a id="sendEditButton" class="ms-3" href="#!"><i
                                                                 class="fas fa-paper-plane"></i></a>
                                                     </div>
                                                     <div id="noChat" class="col-xxl-0 col-xl-12 h-50">
@@ -689,7 +702,7 @@
                         <div class="modal-dialog modal-lg">
                             <div class="modal-content">
                                 <div class="modal-header">
-                                    <h5 class="modal-title">Large Modal</h5>
+                                    <h5 class="modal-title">Участники</h5>
                                     <button type="button" class="btn-close" data-bs-dismiss="modal"
                                             aria-label="Close"></button>
                                 </div>

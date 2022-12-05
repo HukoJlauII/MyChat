@@ -75,8 +75,8 @@ public class User implements UserDetails {
     private LocalDate registrationDate;
 
 
-//    @RestResource(exported=false)
-    @JsonIgnoreProperties(value ="owner",allowSetters = true)
+    //    @RestResource(exported=false)
+    @JsonIgnoreProperties(value = "owner", allowSetters = true)
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinTable(
             name = "user_rooms",

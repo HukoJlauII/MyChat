@@ -1,7 +1,10 @@
 package com.example.mychat.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 import javax.persistence.*;
 
@@ -12,7 +15,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @ToString
 public class Media {
-    public Media(String originalFileName, Long size, String mediaType, byte [] bytes) {
+    public Media(String originalFileName, Long size, String mediaType, byte[] bytes) {
         this.originalFileName = originalFileName;
         this.size = size;
         this.mediaType = mediaType;
@@ -28,7 +31,6 @@ public class Media {
     private String originalFileName;
 
 
-
     @Column(name = "size")
     private Long size;
 
@@ -38,6 +40,6 @@ public class Media {
 
     @Lob
     @JsonIgnore
-    private byte [] bytes;
+    private byte[] bytes;
 
 }
