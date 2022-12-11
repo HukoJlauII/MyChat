@@ -95,8 +95,10 @@ function createAllRooms(response) {
 
 
 function createRoom(response) {
+    console.log(response)
     let src
-    response.owner.avatar === null ? src = 'https://bootdey.com/img/Content/avatar/avatar6.png' : src = '\\image\\' + response.owner.avatar.id
+    let owner = response.owner ? response.owner : user
+    owner.avatar === null ? src = 'https://bootdey.com/img/Content/avatar/avatar6.png' : src = '\\image\\' + owner.avatar.id
     const room = document.createElement('li')
     room.classList.add("p-2", "border-bottom")
     room.innerHTML = "<a href=\"#!\" class=\"d-flex justify-content-between\">\n" +
@@ -162,7 +164,7 @@ function showChat(response) {
         noChatArea.style.display = 'none'
         chatArea.innerHTML = ''
         lastResponse = response
-
+        console.log(lastResponse)
         customizeChatArea()
         showAllMessages(response._embedded.messages)
         chatArea.scrollTop = chatArea.scrollHeight
@@ -184,7 +186,7 @@ function createMessage(response) {
     response.sender.avatar === null ? src = 'https://bootdey.com/img/Content/avatar/avatar6.png' : src = '\\image\\' + response.sender.avatar.id
     const message = document.createElement('div')
     message.id = "message-" + response.id
-    const date = new Date(response.sendTime).toLocaleTimeString([],{timeStyle:'short'});
+    const date = new Date(response.sendTime).toLocaleTimeString([], {timeStyle: 'short'});
     console.log(date)
 
     // const hour = date.getHours();
@@ -230,11 +232,10 @@ function createMessage(response) {
                 chatInputArea.classList.remove('d-flex')
                 chatInputArea.style.display = 'none'
                 editInputArea.querySelector('input').value = response.content
-                editInputArea.querySelector('.bi-x-lg').addEventListener('click',function ()
-                {
+                editInputArea.querySelector('.bi-x-lg').addEventListener('click', function () {
                     backFromEdit()
                 })
-                editSendButton.addEventListener('click', function (){
+                editSendButton.addEventListener('click', function () {
                         editMessage(response)
                     }
                 )
@@ -274,7 +275,7 @@ function createMessage(response) {
 
     return message
 
-    // chatArea.scrollTop = chatArea.scrollHeight
+
 }
 
 function fetchMessages(message) {
@@ -324,6 +325,7 @@ const sendMessage = () => {
 const onMessageReceived = (payload) => {
     const message = JSON.parse(payload.body)
     chatArea.appendChild(createMessage(message))
+    chatArea.scrollTop = chatArea.scrollHeight
 }
 
 sendButton.addEventListener('click', sendMessage)
@@ -334,24 +336,22 @@ document.querySelector('#exampleFormControlInput2').addEventListener("keydown", 
     }
 });
 
-function backFromEdit()
-{
+function backFromEdit() {
     chatInputArea.classList.add('d-flex')
     editInputArea.classList.remove('d-flex')
     editInputArea.style.display = 'none'
-    chatInputArea.style.display='block'
+    chatInputArea.style.display = 'block'
     topChatArea.style.display = 'block'
     editChatArea.style.display = 'none'
 }
 
-function editMessage(response){
-    editedData=document.querySelector('#exampleFormControlInput').value.trim()
-    if (editedData==='')
-    {
+function editMessage(response) {
+    editedData = document.querySelector('#exampleFormControlInput').value.trim()
+    if (editedData === '') {
         backFromEdit()
         return
     }
-    response.content=editedData
+    response.content = editedData
     var settings = {
         "url": "http://localhost:8080/messages/" + response.id,
         "method": "PATCH",
@@ -359,12 +359,12 @@ function editMessage(response){
         "headers": {
             "Content-Type": "application/json"
         },
-        "data":JSON.stringify(response)
+        "data": JSON.stringify(response)
     };
 
     $.ajax(settings).done(function (response) {
-        let message=document.querySelector('#message-'+response.id)
-        message.querySelector('p').innerHTML=response.content
+        let message = document.querySelector('#message-' + response.id)
+        message.querySelector('p').innerHTML = response.content
         backFromEdit()
     });
 }
@@ -435,26 +435,28 @@ function createUser(response) {
 }
 
 
-
 $(chatArea).scroll(function () {
+    console.log(lastResponse)
     // console.log(   chatArea.getBoundingClientRect().y - chatArea.firstChild.getBoundingClientRect().y)
-    if (chatArea.getBoundingClientRect().y - chatArea.firstChild.getBoundingClientRect().y === -32 && lastResponse._links.self.href !== lastResponse._links.last.href) {
-        let lastScrollHeight = chatArea.scrollHeight
-        var settings = {
-            "url": lastResponse._links.next.href,
-            "method": "GET",
-            "timeout": 0,
-            "headers": {
-                "Content-Type": "application/json"
-            },
-        };
-        $.ajax(settings).done(function (response) {
-            console.log(response)
-            lastResponse = response
-            showAllMessages(response._embedded.messages)
-            let scrollDif = chatArea.scrollHeight - lastScrollHeight
-            chatArea.scrollTop += scrollDif
-        });
+    if(lastResponse._links.next) {
+        if (chatArea.getBoundingClientRect().y - chatArea.firstChild.getBoundingClientRect().y === -32 && lastResponse._links.self.href !== lastResponse._links.last.href) {
+            let lastScrollHeight = chatArea.scrollHeight
+            var settings = {
+                "url": lastResponse._links.next.href,
+                "method": "GET",
+                "timeout": 0,
+                "headers": {
+                    "Content-Type": "application/json"
+                },
+            };
+            $.ajax(settings).done(function (response) {
+                console.log(response)
+                lastResponse = response
+                showAllMessages(response._embedded.messages)
+                let scrollDif = chatArea.scrollHeight - lastScrollHeight
+                chatArea.scrollTop += scrollDif
+            });
+        }
     }
 })
 
